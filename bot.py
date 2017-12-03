@@ -26,6 +26,9 @@ async def on_ready():
     print("Démarrage de Reactionner")
     bot.load_extension("Reactionner")
     
+    print("Démarrage de Garou")
+    bot.load_extension("Garou")
+    
     print("FTW's Bot operationelle")
 
 @bot.command(pass_context = True)
