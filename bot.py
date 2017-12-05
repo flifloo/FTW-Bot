@@ -16,19 +16,19 @@ def is_owner(id):
 async def on_ready():
     print("Démarrage de DefaultCMD")
     bot.load_extension("DefaultCMD")
-    
+
     print("Démarrage de ExampleRepl")
     bot.load_extension("ExampleRepl")
-    
+
     print("Démarrage de Benne_a_ordure")
     bot.load_extension("Benne_a_ordure")
-    
+
     print("Démarrage de Reactionner")
     bot.load_extension("Reactionner")
-    
+
     print("Démarrage de Garou")
     bot.load_extension("Garou")
-    
+
     print("FTW's Bot operationelle")
 
 @bot.command(pass_context = True)
@@ -71,4 +71,4 @@ async def on_message(msg):
     print(msg.content)
 """
 
-bot.run("Mzg0MDk0ODcyODIwMjUyNjc0.DPt74w.2t6XZoFVYgk-7eMeS702dqyvoP4")
+bot.run("bot")
