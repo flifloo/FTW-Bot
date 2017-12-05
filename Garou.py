@@ -4,6 +4,14 @@ from discord.ext import commands
 game = 0
 djouers = 0
 
+def is_jouers(author, jouers):
+    for i in range(len(jouers)):
+        if author == jouers[i]:
+            return True
+        
+        else:
+            return False
+
 class Garou:
     def __init__(self, bot):
         self.bot = bot
@@ -12,6 +20,7 @@ class Garou:
     @commands.command(pass_context=True)
     async def gstart(self, ctx):
         """Démarrage d'une partie de Garou"""
+        global game
         if game == 1:
             print("Commande gstart lancer par: "+str(ctx.message.author)+" refuser car une partie est deja en cours")
             await self.bot.say("Désoler mais une partie est deja en cours !")
@@ -39,10 +48,23 @@ class Garou:
                 print("Commande gjouers lancer par: "+str(ctx.message.author)+" argument: "+str(jouers))
                 await self.bot.say("Les jouer de cette partie sont: "+str(jouers))
     
+    #Commande de test
+    @commands.command(pass_content=True)
+    async def gtest(self, ctx):
+        if is_jouers(ctx.message.author, jouers) == True:
+            async self.bot.say("Vous ete bien un jouers !")
+        
+        elif gm == ctx.message.author:
+            async self.bot.say("Vous ete le GM !")
+        
+        
+        else:
+            async self.bot.say("Vous n'ete pas un jouers !")
     
     #Commande pour annuler le Garou
     @commands.command(pass_context=True)
     async def gstop(self, ctx):
+        global game,djouers
         if game == 0:
             print("Commande gstop lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
             await self.bot.say("Désoler mais aucune partie n'est lancer.")
@@ -50,7 +72,7 @@ class Garou:
         elif game == 1:
             if gm == ctx.message.author:
                 #reset de toutes les variables
-                gam = 0
+                game = 0
                 djouers = 0
                 gm = 0
                 print("Partie de garou annuler !")
