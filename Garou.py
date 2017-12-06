@@ -17,13 +17,27 @@ def is_joueurs(sender):
 class Garou:
     def __init__(self, bot):
         self.bot = bot
+        self.games = {} # contiendra toutes les partie en cours
+
+
+    def create_game(self, channel_id): # créer une game : ajout d'option possible
+        game = {
+            'channel' : channel_id,
+            'player' : [],
+        }
+        return game
+
+
+    @commands.group(pass_content = True) #on créer ici un groupe de sous commande
+    async def lg(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await self.bot.say('Pour commencer, taper lg start')
 
 
     #Commande de démarrage du Garou
-    @commands.command(pass_context=True)
-    async def gstart(self, ctx):
-        """Démarrage d'une partie de Garou"""
-        global game
+    @lg.command(pass_context=True)
+    async def start(self, ctx):
+        """Commence la partie"""
         if game == 1:
             print("Commande gstart lancer par: "+str(ctx.message.author)+" refuser car une partie est deja en cours")
             await self.bot.say("Désoler mais une partie est deja en cours !")
