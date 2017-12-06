@@ -5,10 +5,10 @@ game = 0
 djoueurs = 0
 joueurs = str("0")
 
-def is_joueurs(author):
+def is_joueurs(sender):
     global joueurs
     for i in range(len(joueurs)):
-        if author == joueurs[i]:
+        if ctx == joueurs[i]:
             return True
 
         else:
@@ -57,7 +57,8 @@ class Garou:
     #Commande de test
     @commands.command(pass_content=True)
     async def gtest(self, ctx):
-        if is_joueurs(ctx.message.author) == True:
+        sender = ctx.message.author
+        if is_joueurs(sender) == True:
             await self.bot.say("Vous ete bien un joueurs !")
 
         elif gm == ctx.message.author:
