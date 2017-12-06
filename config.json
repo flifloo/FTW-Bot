@@ -1,0 +1,8 @@
+{
+    "Bot" : {
+        "name": "FTW - Bot",
+        "description": "Je suis le bot du serveur FTW !",
+        "prefix": "<@384094872820252674> ",
+        "token": "-"
+    }
+}
