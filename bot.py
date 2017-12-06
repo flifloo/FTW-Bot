@@ -75,4 +75,4 @@ async def on_message(msg):
     print(msg.content)
 """
 
-bot.run("bot")
+bot.run(parameter['Bot']['token'])
