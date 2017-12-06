@@ -1,7 +1,11 @@
+import json
 import discord
 from discord.ext import commands
 
-bot = commands.Bot(description="Je suis le bot du serveur FTW !", command_prefix="<@384094872820252674> ")
+with open('config.json') as json_data_file:
+    parameter = json.load(json_data_file)
+
+bot = commands.Bot(command_prefix=parameter['Bot']['prefix'], description=parameter['Bot']['description'])
 
 owner = ["177393521051959306"]
 
