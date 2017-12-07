@@ -1,0 +1,8 @@
+{
+    "Bot" : {
+        "name": "Bot Name",
+        "description": "A simple description",
+        "prefix": "What wille summon the bot ?",
+        "token": "They login Token"
+    }
+}
