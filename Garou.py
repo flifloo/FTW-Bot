@@ -5,14 +5,7 @@ game = 0
 djoueurs = 0
 joueurs = str("0")
 
-def is_joueurs(sender):
-    global joueurs
-    for i in range(len(joueurs)):
-        if ctx == joueurs[i]:
-            return True
 
-        else:
-            return False
 
 class Garou:
     def __init__(self, bot):
@@ -24,29 +17,56 @@ class Garou:
         game = {
             'channel' : channel_id,
             'player' : [],
+            'message' : None
         }
         return game
 
+    def get_game(self,channel_id):
+        for game in self.games:
+            if channel_id == game['channel']:
+                return game
+        return None
 
-    @commands.group(pass_content = True) #on créer ici un groupe de sous commande
-    async def lg(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.say('Pour commencer, taper lg start')
+
+    def embed(self):
+        info = discord.Embed()
+        info.title = 'Garou : Choose the player'
+        info.colour = random.randint(0, 0xFFFFFF)
+        info.add_field(name='Description', value="Voici une description ndu jeu")
+        info.add_field(name='Info', value="Choose the player by react on this message !")
+        info.set_footer(text="Loup Garou by jbdo99 & flifloo")
+        return info
+
+
+
+
+    @self.bot.group(pass_content= True, name= "lg") #on créer ici un groupe de sous commande
+    async def loup_garou(self, ctx):
+        """Group of sub command for Garou"""
+        try:
+            if ctx.invoked_subcommand is None:
+                await self.bot.say('Pour commencer, taper lg start')
+        except:
+            pass
 
 
     #Commande de démarrage du Garou
-    @lg.command(pass_context=True)
+    @loup_garou.command(pass_context=True)
     async def start(self, ctx):
         """Commence la partie"""
-        if game == 1:
-            print("Commande gstart lancer par: "+str(ctx.message.author)+" refuser car une partie est deja en cours")
-            await self.bot.say("Désoler mais une partie est deja en cours !")
-        elif game == 0:
-            game = 1
-            gm = ctx.message.author
-            print("L'ancement d'une partie de Garou par: "+str(ctx.message.author))
-            await self.bot.say("Lancmeent d'une partie !")
-            await self.bot.say("Veuiller specifier les joueurs avec la commande gjoueurs")
+        if self.get_game(ctx.message.channel) == None: # on verifie si il n y pas de partie en cours dans ce salon
+            self.games[ctx.message.channel] = self.create_game(ctx.message.channel) # on créer le jeu
+            game['message'] = await self.bot.send_message(ctx.message.channel,embed=self.embed())
+            for emoji in ["▶️"]:
+                await self.bot.add_reaction(message=game["message"],emoji=emoji)
+            nopi = True
+            while nopi:
+                waiter = await self.bot.wait_for_reaction(message=game["message"],timeout=40.0)
+                if not waiter == None:
+                    if (waiter[0].emoji == "▶️"):
+                        await self.bot.say("Un joueur en plus !")
+        else:
+            await self.bot.say("A game already started")
 
     #Commande pour definir les participant du Garou
     @commands.command(pass_context=True)

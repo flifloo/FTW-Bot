@@ -4,3 +4,5 @@ config.json
 __pycache__\
 
 log_test.txt
+
+__pycache__/
