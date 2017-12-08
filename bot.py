@@ -1,5 +1,6 @@
 import json
 import discord
+import random
 from discord.ext import commands
 
 with open('config.json') as json_data_file:

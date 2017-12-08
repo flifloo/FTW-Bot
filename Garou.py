@@ -1,4 +1,5 @@
 import discord
+import random
 from discord.ext import commands
 
 game = 0
@@ -39,35 +40,25 @@ class Garou:
 
 
 
-
-    @self.bot.group(pass_content= True, name= "lg") #on créer ici un groupe de sous commande
-    async def loup_garou(self, ctx):
-        """Group of sub command for Garou"""
-        try:
-            if ctx.invoked_subcommand is None:
-                await self.bot.say('Pour commencer, taper lg start')
-        except:
-            pass
-
-
     #Commande de démarrage du Garou
-    @loup_garou.command(pass_context=True)
+    @commands.command(pass_context=True, name="lg")
     async def start(self, ctx):
         """Commence la partie"""
         if self.get_game(ctx.message.channel) == None: # on verifie si il n y pas de partie en cours dans ce salon
             self.games[ctx.message.channel] = self.create_game(ctx.message.channel) # on créer le jeu
-            game['message'] = await self.bot.send_message(ctx.message.channel,embed=self.embed())
-            for emoji in ["▶️"]:
-                await self.bot.add_reaction(message=game["message"],emoji=emoji)
+            game = self.games[ctx.message.channel]
+            game['message'] = await self.bot.send_message(ctx.message.channel,embed=self.embed()) # on affiche le message et on le met dans le game
+            for emoji in ["💚"]:
+                await self.bot.add_reaction(message=game["message"],emoji=emoji) #on fai apparaitre le/les reac du bot
             nopi = True
             while nopi:
                 waiter = await self.bot.wait_for_reaction(message=game["message"],timeout=40.0)
                 if not waiter == None:
-                    if (waiter[0].emoji == "▶️"):
+                    if (waiter[0].emoji == "💚"):
                         await self.bot.say("Un joueur en plus !")
         else:
             await self.bot.say("A game already started")
-
+"""
     #Commande pour definir les participant du Garou
     @commands.command(pass_context=True)
     async def gjoueurs(self, ctx, *, CMDjoueurs):
@@ -80,7 +71,7 @@ class Garou:
         elif game == 1:
             if djoueurs == 1:
                 print("Commande gjoueurs lancer par: "+str(ctx.message.author)+" refuser, partie deja lacer !")
-                await slef.bot.say("Désoler mais une partie est deja en cours !")
+                await self.bot.say("Désoler mais une partie est deja en cours !")
 
             elif djoueurs == 0:
                 djoueurs = 1
@@ -122,7 +113,7 @@ class Garou:
             else:
                 print("Commande gstop mancer par: "+str(ctx.message.author)+" refuser car ce n'est pas le gm !")
                 await self.bot.say("Désoler mais vous n'avez pas le droit de faire ça, vous n'étes pas le gm !")
-
+"""
 
 def setup(bot):
     bot.add_cog(Garou(bot))
