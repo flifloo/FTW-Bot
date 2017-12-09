@@ -49,13 +49,14 @@ class Garou:
             game = self.games[ctx.message.channel]
             game['message'] = await self.bot.send_message(ctx.message.channel,embed=self.embed()) # on affiche le message et on le met dans le game
             for emoji in ["💚"]:
-                await self.bot.add_reaction(message=game["message"],emoji=emoji) #on fai apparaitre le/les reac du bot
-            nopi = True
+                await self.bot.add_reaction(message=game["message"],emoji=emoji) #on fait apparaitre le/les reac du bot
+            
+            nopi = True #boucle infin (a ccorriger, j vais mettre une time out)
             while nopi:
-                waiter = await self.bot.wait_for_reaction(message=game["message"],timeout=40.0)
-                if not waiter == None:
-                    if (waiter[0].emoji == "💚"):
-                        await self.bot.say("Un joueur en plus !")
+                waiter = await self.bot.wait_for_reaction(message=game["message"],timeout=40.0) #on attend les reac (le timeout est mis a 40, j vais modif ca + tard)
+                if not waiter == None: # si c est pas none
+                    if (waiter[0].emoji == "💚" and waiter[1] != self.bot.user): # si la rec est la bonne et que c est pas le bot (car discord prend du temp  a mettre les reac et le bot croie que sa propre reac est une nouvelle)
+                        await self.bot.say("Un joueur en plus !") #ici on mettre l ajout d un utilisateur
         else:
             await self.bot.say("A game already started")
 """
