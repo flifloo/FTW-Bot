@@ -3,9 +3,9 @@ from discord.ext import commands
 
     #Paramètres
 
-deletion_minimal = -2       #quantité de votes totale nécessaire     
+deletion_minimal = -2       #quantité de votes totale nécessaire
                             #pour supprimer un post.
-                            #Prends en compte le nombre de votes 
+                            #Prends en compte le nombre de votes
                             #pour le conserver et pour le supprimer.
 delet_symbole = "🗑"   #Réaction permettant la suppression du post.
 cons_symbole = "♻"    #Réaction permettant la conservation du post.
@@ -42,8 +42,8 @@ async def first_reaction(self , reaction , user):
         elif reaction.emoji == cons_symbole:
             reactDict[reaction.message.id]=1
         date,heure = timeCorrect(reaction.message.timestamp)
-        
-        
+
+
         message = str(reaction.message.author.mention)+" a recut un vote pour la suppression ou la conservation de son message du "+str(reaction.message.timestamp)+".Si vous souhaitez voir son message supprimé, votez "+delet_symbole+". Si vous pensez que son message est correct, votez "+str(cons_symbole)+"."
         m = await self.bot.send_message(reaction.message.channel,message)
         messageDict[reaction.message.id]=m
@@ -58,13 +58,13 @@ async def delete(self , reaction , user):
 def timeCorrect(temps):
     date = "5"
     heure = "6"
-    
-    
-    
-    
-    
+
+
+
+
+
     return date,heure
-    
+
 
 
 class Ben:
@@ -73,8 +73,8 @@ class Ben:
         f = open("log_test.txt","a")    #Montres le début de l'enregistrement dans les logs.
         f.write("\n\nDébut de l'enregistrement des réactions.\n\n\n")
         f.close
-    
-    
+
+
     async def on_reaction_remove(self,reaction,user):#Récupères la réaction
         print("-"+str(reaction.emoji))  #si on retire une réaction.
         print(reaction.count)
@@ -82,24 +82,24 @@ class Ben:
         print(reaction.message.id)
         if str(reaction.emoji) == cons_symbole:  #Vérifie si le caractère
             reactDict[reaction.message.id]-=1  #corresponds au symbole
-        elif str(reaction.emoji) == delet_symbole:   #de suppression 
-            reactDict[reaction.message.id]+=1  
+        elif str(reaction.emoji) == delet_symbole:   #de suppression
+            reactDict[reaction.message.id]+=1
                                                  #ou au symbole de conservation.
-        print("num = "+str(reactDict[reaction.message.id]))                                         
-        if reactDict[reaction.message.id]==deletion_minimal:    
-            await delete(self , reaction , user)                  #si le 
+        print("num = "+str(reactDict[reaction.message.id]))
+        if reactDict[reaction.message.id]==deletion_minimal:
+            await delete(self , reaction , user)                  #si le
                                                                 #nombre est
                                                                 #suppérieur,
                                                                 #suppression.
 
-        
-    
-    
+
+
+
     #def auto_deletion(self,Message):
     #    await self.bot.delete_message(Message)
     #    print(Message.content)
 
-    
+
 
     async def on_reaction_add(self, reaction, user): #Récupères la réaction
         print("+"+str(reaction.emoji))      #si on ajoute une réaction.
@@ -108,30 +108,30 @@ class Ben:
         print(reaction.message.id)
         if anti_delete(reaction.message.author.id)== True:
             print("message autorise")
-            if str(reaction.emoji) <= cons_symbole:  
+            if str(reaction.emoji) == cons_symbole:  
                 if reactDict.get(reaction.message.id)!=None:
                     reactDict[reaction.message.id]+=1
                     print("message present")
                 else:
                     await first_reaction(self,reaction,user)
-                
-            
-            
+
+
+
             if str(reaction.emoji) == delet_symbole:
                 if reactDict.get(reaction.message.id)!=None:
                     reactDict[reaction.message.id]-=1
                     print("message present")
                 else:
                     await first_reaction(self,reaction,user)
-                
-            
-            
+
+
+
             if reactDict.get(reaction.message.id) != None :
                 if reactDict[reaction.message.id]<=deletion_minimal:
                     await delete(self , reaction , user)
                 else:
                     print(reactDict[reaction.message.id])
-            
+
             print("tzdsqdzqs"+str(reactDict[reaction.message.id]))
 
 def setup(bot):
