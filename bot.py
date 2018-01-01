@@ -19,6 +19,9 @@ def is_owner(id):
 #Démarrage
 @bot.event
 async def on_ready():
+    print("Définition du statu de base")
+    await bot.change_presence(game=discord.Game(name='a se faire toucher le code'))
+
     print("Démarrage de DefaultCMD")
     bot.load_extension("DefaultCMD")
 
@@ -33,6 +36,9 @@ async def on_ready():
 
     print("Démarrage de Garou")
     bot.load_extension("Garou")
+
+    print("Démarrage de Music")
+    bot.load_extension("Music")
 
     print("FTW's Bot operationelle")
 
