@@ -133,6 +133,7 @@ class Music:
         """
         state = self.get_voice_state(ctx.message.server)
         opts = {
+            "format":"bestaudio/worstvideo",
             'default_search': 'auto',
             'quiet': True,
         }
