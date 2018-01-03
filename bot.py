@@ -41,6 +41,8 @@ async def on_ready():
     bot.load_extension("Music")
 
     print("FTW's Bot operationelle")
+    channel = bot.get_channel("389209382388498445")
+    await bot.send_message(channel, "FTW's Bot operationelle")
 
 @bot.command(pass_context = True)
 async def load(ctx, ext):

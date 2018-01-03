@@ -63,6 +63,7 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, ' Joue maintenant ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
+
 class Music:
     """Commandes de musique.
     """
@@ -91,6 +92,12 @@ class Music:
                     self.bot.loop.create_task(state.voice.disconnect())
             except:
                 pass
+
+    def is_listening(self, user_channel):
+        for bot_channel in self.bot.voice_clients:
+            if bot_channel.channel == user_channel:
+                return True
+            return False
 
     @commands.command(pass_context=True, no_pm=True)
     async def join(self, ctx, *, channel : discord.Channel):
@@ -156,67 +163,95 @@ class Music:
             await state.songs.put(entry)
 
     @commands.command(pass_context=True, no_pm=True)
+    async def listening(self, ctx):
+        voice_channel_id = ctx.message.author.voice_channel
+        if self.is_listening(voice_channel_id) == True:
+            await self.bot.say("Vous écouter le bot !")
+
+        elif self.is_listening(voice_channel_id) == False:
+            await self.bot.say("Vous n'écouter pas le bot !")
+
+    @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
         """Définie le volume du bot."""
+        voice_channel_id = ctx.message.author.voice_channel
+        if self.is_listening(voice_channel_id) == True:
+            state = self.get_voice_state(ctx.message.server)
+            if state.is_playing():
+                player = state.player
+                player.volume = value / 100
+                await self.bot.say('Volume mit à {:.0%}'.format(player.volume))
 
-        state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.volume = value / 100
-            await self.bot.say('Volume mit à {:.0%}'.format(player.volume))
+        elif self.is_listening(voice_channel_id) == False:
+            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
+
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
         """Relance la misique jouée."""
-        state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.resume()
+        voice_channel_id = ctx.message.author.voice_channel
+        if self.is_listening(voice_channel_id) == True:
+            state = self.get_voice_state(ctx.message.server)
+            if state.is_playing():
+                player = state.player
+                player.resume()
+
+        elif self.is_listening(voice_channel_id) == False:
+            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
         """Arrete la musique jouée et quitte le channel.
         Cela vide aussi la queue.
         """
-        server = ctx.message.server
-        state = self.get_voice_state(server)
+        voice_channel_id = ctx.message.author.voice_channel
+        if self.is_listening(voice_channel_id) == True:
+            server = ctx.message.server
+            state = self.get_voice_state(server)
 
-        if state.is_playing():
-            player = state.player
-            player.stop()
+            if state.is_playing():
+                player = state.player
+                player.stop()
 
-        try:
-            state.audio_player.cancel()
-            del self.voice_states[server.id]
-            await state.voice.disconnect()
-            await self.bot.say("Queue vidée et channel quitté. ")
-        except:
-            pass
+            try:
+                state.audio_player.cancel()
+                del self.voice_states[server.id]
+                await state.voice.disconnect()
+                await self.bot.say("Queue vidée et channel quitté. ")
+            except:
+                pass
+
+        elif self.is_listening(voice_channel_id) == False:
+            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
         """Vote pour passer la chanson en cours.
         Il faut trois votes pour passer la chanson.
         """
+        voice_channel_id = ctx.message.author.voice_channel
+        if self.is_listening(voice_channel_id) == True:
+            state = self.get_voice_state(ctx.message.server)
+            if not state.is_playing():
+                await self.bot.say("Aucune chanson n'est jouée actuellement...")
+                return
 
-        state = self.get_voice_state(ctx.message.server)
-        if not state.is_playing():
-            await self.bot.say("Aucune chanson n'est jouée actuellement...")
-            return
-
-        voter = ctx.message.author
-        if voter == state.current.requester:
-            await self.bot.say('Une requete pour passer la chanson a été faite.')
-            state.skip()
-        elif voter.id not in state.skip_votes:
-            state.skip_votes.add(voter.id)
-            total_votes = len(state.skip_votes)
-            if total_votes >= 3:
-                await self.bot.say('Vote pour passer effectué,chanson passée...')
+            voter = ctx.message.author
+            if voter == state.current.requester:
+                await self.bot.say('Une requete pour passer la chanson a été faite.')
                 state.skip()
+            elif voter.id not in state.skip_votes:
+                state.skip_votes.add(voter.id)
+                total_votes = len(state.skip_votes)
+                if total_votes >= 3:
+                    await self.bot.say('Vote pour passer effectué,chanson passée...')
+                    state.skip()
+                else:
+                    await self.bot.say('Vote pour passer effectué, actuellement à [{}/3]'.format(total_votes))
             else:
-                await self.bot.say('Vote pour passer effectué, actuellement à [{}/3]'.format(total_votes))
-        else:
-            await self.bot.say('Vous avez deja voté pour passer cette chanson.')
+                await self.bot.say('Vous avez deja voté pour passer cette chanson.')
+
+        elif self.is_listening(voice_channel_id) == False:
+            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
@@ -228,7 +263,7 @@ class Music:
         else:
             skip_count = len(state.skip_votes)
             await self.bot.say('Joue actuellement {} [skips: {}/3]'.format(state.current, skip_count))
-            
+
 def setup(bot):
     bot.add_cog(Music(bot))
     print('Music is loaded')
