@@ -64,3 +64,4 @@ class Reactionner:
 
 def setup(bot):
     bot.add_cog(Reactionner(bot))
+    print("Reactionner charger")

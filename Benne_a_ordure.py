@@ -108,7 +108,7 @@ class Ben:
         print(reaction.message.id)
         if anti_delete(reaction.message.author.id)== True:
             print("message autorise")
-            if str(reaction.emoji) == cons_symbole:  
+            if str(reaction.emoji) == cons_symbole:
                 if reactDict.get(reaction.message.id)!=None:
                     reactDict[reaction.message.id]+=1
                     print("message present")
@@ -136,3 +136,4 @@ class Ben:
 
 def setup(bot):
     bot.add_cog(Ben(bot))
+    print("Benne_a_ordure charger")

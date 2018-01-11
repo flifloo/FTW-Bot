@@ -1,20 +1,14 @@
 import json
 import discord
-import random
 from discord.ext import commands
+
 
 with open('config.json') as json_data_file:
     parameter = json.load(json_data_file)
 
 bot = commands.Bot(command_prefix=parameter['Bot']['prefix'], description=parameter['Bot']['description'])
+bot.remove_command("help")
 
-owner = ["177393521051959306"]
-
-def is_owner(id):
-    for i in range(len(owner)):
-        if id == owner[i]:
-            return True
-    return False
 
 #Démarrage
 @bot.event
@@ -25,8 +19,8 @@ async def on_ready():
     print("Démarrage de DefaultCMD")
     bot.load_extension("DefaultCMD")
 
-    print("Démarrage de ExampleRepl")
-    bot.load_extension("ExampleRepl")
+    print("Démarrage de Administration")
+    bot.load_extension("Administration")
 
     print("Démarrage de Benne_a_ordure")
     bot.load_extension("Benne_a_ordure")
@@ -41,47 +35,20 @@ async def on_ready():
     bot.load_extension("Music")
 
     print("FTW's Bot operationelle")
+    embed=discord.Embed(title="Administration", description="", color=0xffff00)
+    embed.set_thumbnail(url="https://icon-icons.com/icons2/562/PNG/512/on-off-power-button_icon-icons.com_53938.png")
+    embed.add_field(name="Démarrage", value="FTW's Bot operationelle", inline=False)
     channel = bot.get_channel("389209382388498445")
-    await bot.send_message(channel, "FTW's Bot operationelle")
+    await bot.send_message(channel, embed=embed)
 
-@bot.command(pass_context = True)
-async def load(ctx, ext):
-    """: Charge une extension"""
-    if is_owner(ctx.message.author.id) == True:
-        bot.load_extension(ext)
-        print("Extention "+str(ext)+" charger par: "+str(ctx.message.author))
-        await bot.say("Extension "+str(ext)+" charger")
-    else:
-        await bot.say("Désoler <@"+str(ctx.message.author.id)+"> mais vous n'avez pas le droit de faire ca !")
-        print("Refue de charger: "+str(ext)+" car "+str(ctx.message.author)+" n'a pas le droit !")
+@bot.command(pass_context=True)
+async def help(ctx):
+    embed=discord.Embed(title="Music", description="Aide", color=0x80ff00)
+    embed.set_thumbnail(url="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-help-128.png")
+    embed.add_field(name="basic", value="Pour voir les commands basique faite: ```basic```", inline=True)
+    embed.add_field(name="Garou", value="Pour voir les commands du Garou faite: ```lg help```", inline=True)
+    embed.add_field(name="Music", value="Pour voir les commandes pour la musique faite: ```music help```", inline=True)
+    await bot.say(embed=embed)
 
-@bot.command(pass_context = True)
-async def unload(ctx,ext):
-    """: Décharge une extension"""
-    if is_owner(ctx.message.author.id) == True:
-        bot.unload_extension(ext)
-        print("extention "+str(ext)+" décharger")
-        await bot.say("Extension "+str(ext)+" décharger")
-    else:
-        await bot.say("Désoler <@"+str(ctx.message.author.id)+"> mais vous n'avez pas le droit de faire ca !")
-        print("Refue de décharger: "+str(ext)+" car "+str(ctx.message.author)+" n'a pas le droit !")
-
-@bot.command(pass_context = True)
-async def reload(ctx,ext):
-    """: Recharge une extension avec ses modifications"""
-    if is_owner(ctx.message.author.id) == True:
-        bot.unload_extension(ext)
-        bot.load_extension(ext)
-        print("Extention "+str(ext)+" mis à jour par: "+str(ctx.message.author))
-        await bot.say("Extension "+str(ext)+" mis à jour")
-    else:
-        await bot.say("Désoler <@"+str(ctx.message.author.id)+"> mais vous n'avez pas le droit de faire ca !")
-        print("Refue de mettre à jour: "+str(ext)+" car "+str(ctx.message.author)+" n'a pas le droit !")
-
-"""
-@bot.event
-async def on_message(msg):
-    print(msg.content)
-"""
 
 bot.run(parameter['Bot']['token'])

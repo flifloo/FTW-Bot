@@ -60,7 +60,11 @@ class VoiceState:
         while True:
             self.play_next_song.clear()
             self.current = await self.songs.get()
-            await self.bot.send_message(self.current.channel, ' Joue maintenant ' + str(self.current))
+            print("Musi en cours lancer: "+str(self.current))
+            embed=discord.Embed(title="Music", description="En cours", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="play", value="Joue maintenant \n" + str(self.current), inline=True)
+            await self.bot.send_message(self.current.channel, embed=embed)
             self.current.player.start()
             await self.play_next_song.wait()
 
@@ -99,37 +103,61 @@ class Music:
                 return True
             return False
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def join(self, ctx, *, channel : discord.Channel):
-        """Rejoins le channel vocal. Ne fonctionne que si l'utilisateur est deja dans un channel.
-        Ne semble pas fonctionner pour le moment."""
-        try:
-            await self.create_voice_client(channel)
-        except discord.ClientException:
-            await self.bot.say('Already in a voice channel...')
-        except discord.InvalidArgument:
-            await self.bot.say('This is not a voice channel...')
-        else:
-            await self.bot.say('Ready to play audio in **' + channel.name)
+    #Definition du group music
+    @commands.group(pass_context=True)
+    async def music(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.invoke(self.help)
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Un simple help
+    @music.command(pass_context=True, no_pm=True)
+    async def help(self, ctx):
+        embed=discord.Embed(title="Music", description="Aide", color=0x80ff00)
+        embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+        embed.add_field(name="play", value="Lancer une musique", inline=True)
+        embed.add_field(name="playing", value="Voir se qui passe", inline=True)
+        embed.add_field(name="pause", value="MEt en pause la musique, ne marche pas", inline=True)
+        embed.add_field(name="resume", value="Continue la musique", inline=True)
+        embed.add_field(name="skip", value="Passer la musique", inline=True)
+        embed.add_field(name="stop", value="Arreter la musique", inline=True)
+        embed.add_field(name="summon", value="Faire apparaitre le bot", inline=True)
+        embed.add_field(name="volume", value="DEfinir le volume de la musique", inline=True)
+        await self.bot.say(embed=embed)
+
+    #Permmet de faire connecter vocalement le bot
+    @music.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         """Invoque le bot dans le channel vocal.
         Ne fonctionne que si l'utilisateur est déja dans un channel."""
         summoned_channel = ctx.message.author.voice_channel
         if summoned_channel is None:
-            await self.bot.say('Are you sure your in a channel?')
+            print("Commande music summon lancer par: "+str(ctx.message.author)+" refuser car il n'est pas dans un channel vocal")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="summon", value="Vous n'étes pas dans un channel vocal !", inline=True)
+            await self.bot.say(embed=embed)
             return False
 
         state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
+            print("Commande music summon lancer par: "+str(ctx.message.author))
             state.voice = await self.bot.join_voice_channel(summoned_channel)
+            embed=discord.Embed(title="Music", description="", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="summon", value="Il se materialise a vous !", inline=True)
+            await self.bot.say(embed=embed)
         else:
+            print("Commande music summon lancer par: "+str(ctx.message.author))
             await state.voice.move_to(summoned_channel)
+            embed=discord.Embed(title="Music", description="", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="summon", value="Il se téléporte a vous !", inline=True)
+            await self.bot.say(embed=embed)
 
         return True
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Permet de mettre a jouer une musique
+    @music.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, song : str):
         """Joue une musique.
         S'il y a une musique qui joue deja, alors elle est mise dans
@@ -147,6 +175,10 @@ class Music:
 
         if state.voice is None:
             success = await ctx.invoke(self.summon)
+            print("Commande music play lancer par: "+str(ctx.message.author))
+            #embed=discord.Embed(title="Music", description="", color=0x80ff00)
+            #embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            #embed.add_field(name="play", value="Chargement de la musique...", inline=True)
             await self.bot.say("Chargement de la musique...")
             if not success:
                 return
@@ -155,23 +187,24 @@ class Music:
             player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
         except Exception as e:
             fmt = 'Une erreur est arrivé lors du traitement de la requete: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+            print("Commande music play lancer par: "+str(ctx.message.author)+" erreur: "+fmt.format(type(e).__name__, e))
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="play", value=fmt.format(type(e).__name__, e), inline=True)
+            await self.bot.send_message(ctx.message.channel, embed=embed)
         else:
             player.volume = 0.6
             entry = VoiceEntry(ctx.message, player)
-            await self.bot.say('La musique ' + str(entry)+" a été mise en queue")
+            print("Commande music play lancer par: "+str(ctx.message.author)+" mise en queue")
+            embed=discord.Embed(title="Music", description="", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="play", value="La musique \n" + str(entry)+" \na été mise en queue", inline=True)
+            await self.bot.say(embed=embed)
             await state.songs.put(entry)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def listening(self, ctx):
-        voice_channel_id = ctx.message.author.voice_channel
-        if self.is_listening(voice_channel_id) == True:
-            await self.bot.say("Vous écouter le bot !")
 
-        elif self.is_listening(voice_channel_id) == False:
-            await self.bot.say("Vous n'écouter pas le bot !")
-
-    @commands.command(pass_context=True, no_pm=True)
+    #Permmet de definit le volume
+    @music.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
         """Définie le volume du bot."""
         voice_channel_id = ctx.message.author.voice_channel
@@ -180,25 +213,43 @@ class Music:
             if state.is_playing():
                 player = state.player
                 player.volume = value / 100
-                await self.bot.say('Volume mit à {:.0%}'.format(player.volume))
+                print("Commande music volume lancer par: "+str(ctx.message.author))
+                embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="volume", value='Volume mit à {:.0%}'.format(player.volume), inline=True)
+                await self.bot.say(embed=embed)
 
         elif self.is_listening(voice_channel_id) == False:
-            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
+            print("Commande music volume lancer par: "+str(ctx.message.author)+" refuser car il n'est pas dans le channel vocal")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="volume", value="Vous n'étes pas dans le channel vocal !", inline=True)
+            await self.bot.say(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Reprend la music
+    @music.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
-        """Relance la misique jouée."""
         voice_channel_id = ctx.message.author.voice_channel
         if self.is_listening(voice_channel_id) == True:
             state = self.get_voice_state(ctx.message.server)
             if state.is_playing():
                 player = state.player
                 player.resume()
+                print("Commande music resume lancer par: "+str(ctx.message.author))
+                embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="resume", value="Reprise de la musique", inline=True)
+                await self.bot.say(embed=embed)
 
         elif self.is_listening(voice_channel_id) == False:
-            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
+            print("Commande music resume lancer par: "+str(ctx.message.author)+" refuser car il n'est pas dans le channel vocal")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="resume", value="Vous n'étes pas dans le channel vocal !", inline=True)
+            await self.bot.say(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Arret la musique et fait quitter le bot
+    @music.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
         """Arrete la musique jouée et quitte le channel.
         Cela vide aussi la queue.
@@ -216,14 +267,23 @@ class Music:
                 state.audio_player.cancel()
                 del self.voice_states[server.id]
                 await state.voice.disconnect()
-                await self.bot.say("Queue vidée et channel quitté. ")
+                print("Commande music stop lancer par: "+str(ctx.message.author))
+                embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="stop", value="Queue vidée et channel quitté.", inline=True)
+                await self.bot.say(embed=embed)
             except:
                 pass
 
         elif self.is_listening(voice_channel_id) == False:
-            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
+            print("Commande music stop lancer par: "+str(ctx.message.author)+" refuser car il n'est pas dans le channel vocal")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="stop", value="Vous n'étes pas dans le channel vocal !", inline=True)
+            await self.bot.say(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Permet de passer la musique en cours
+    @music.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
         """Vote pour passer la chanson en cours.
         Il faut trois votes pour passer la chanson.
@@ -232,38 +292,68 @@ class Music:
         if self.is_listening(voice_channel_id) == True:
             state = self.get_voice_state(ctx.message.server)
             if not state.is_playing():
-                await self.bot.say("Aucune chanson n'est jouée actuellement...")
+                print("Commande music skip lancer par: "+str(ctx.message.author)+" refuser car rien est jouer")
+                embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="skip", value="Aucune chanson n'est jouée actuellement...", inline=True)
+                await self.bot.say(embed=embed)
                 return
 
             voter = ctx.message.author
             if voter == state.current.requester:
-                await self.bot.say('Une requete pour passer la chanson a été faite.')
+                print("Commande music skip lancer par: "+str(ctx.message.author)+" requete envoyer")
+                embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="skip", value="Une requete pour passer la chanson a été faite.", inline=True)
+                await self.bot.say(embed=embed)
                 state.skip()
             elif voter.id not in state.skip_votes:
                 state.skip_votes.add(voter.id)
                 total_votes = len(state.skip_votes)
                 if total_votes >= 3:
-                    await self.bot.say('Vote pour passer effectué,chanson passée...')
+                    print("Commande music skip lancer")
+                    embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                    embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                    embed.add_field(name="skip", value="Vote pour passer effectué, chanson passée...", inline=True)
+                    await self.bot.say(embed=embed)
                     state.skip()
                 else:
-                    await self.bot.say('Vote pour passer effectué, actuellement à [{}/3]'.format(total_votes))
+                    embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                    embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                    embed.add_field(name="skip", value="Vote pour passer effectué, actuellement à [{}/3]".format(total_votes), inline=True)
+                    await self.bot.say(embed=embed)
             else:
-                await self.bot.say('Vous avez deja voté pour passer cette chanson.')
+                embed=discord.Embed(title="Music", description="", color=0x80ff00)
+                embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+                embed.add_field(name="skip", value="Vous avez deja voté pour passer cette chanson.", inline=True)
+                await self.bot.say(embed=embed)
 
         elif self.is_listening(voice_channel_id) == False:
-            await self.bot.say("Désoler mais vous n'écouter pas le bot !")
+            print("Commande music skip lancer par: "+str(ctx.message.author)+" refuser car il n'est pas dans le channel vocal")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="skip", value="Vous n'étes pas dans le channel vocal !", inline=True)
+            await self.bot.say(embed=embed)
 
-    @commands.command(pass_context=True, no_pm=True)
+    #Affiche la musique actuellement lancer
+    @music.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
-        """Montre des informations sur la chanson jouée."""
 
         state = self.get_voice_state(ctx.message.server)
         if state.current is None:
-            await self.bot.say("Rien n'est joué.")
+            print("Commande music playing lancer par: "+str(ctx.message.author)+" refuser car rien est jouer")
+            embed=discord.Embed(title="Music", description="Erreur", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="playing", value="Aucune chanson n'est jouée actuellement...", inline=True)
+            await self.bot.say(embed=embed)
         else:
             skip_count = len(state.skip_votes)
-            await self.bot.say('Joue actuellement {} [skips: {}/3]'.format(state.current, skip_count))
+            print("Commande music playing lancer par: "+str(ctx.message.author))
+            embed=discord.Embed(title="Music", description="", color=0x80ff00)
+            embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
+            embed.add_field(name="playing", value="Joue actuellement {} [skips: {}/3]".format(state.current, skip_count), inline=True)
+            await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Music(bot))
-    print('Music is loaded')
+    print('Music charger')
