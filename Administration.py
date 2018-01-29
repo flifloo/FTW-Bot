@@ -13,9 +13,8 @@ class Administration:
     owner = parameter['Perms']['Admin']
 
     def is_owner(self, id):
-        for i in range(len(self.owner)):
-            if id == self.owner[i]:
-                return True
+        if id in self.owner:
+            return True
         return False
 
 

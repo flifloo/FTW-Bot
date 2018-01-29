@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 licorne_symbole = "🦄"
-licorne = ["licorne"]
+licorne = ["licorne", "pony"]
 
 caca_symbole = "💩"
 caca = ["caca", "merde"]

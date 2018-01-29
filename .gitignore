@@ -6,3 +6,6 @@ __pycache__\
 log_test.txt
 
 __pycache__/
+
+.vscode/
+.vscode\

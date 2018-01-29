@@ -14,7 +14,7 @@ bot.remove_command("help")
 @bot.event
 async def on_ready():
     print("Définition du statu de base")
-    await bot.change_presence(game=discord.Game(name='a se faire toucher le code'))
+    await bot.change_presence(game=discord.Game(name=parameter['Bot']['statu']))
 
     print("Démarrage de DefaultCMD")
     bot.load_extension("DefaultCMD")
