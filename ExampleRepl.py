@@ -163,4 +163,4 @@ class REPL:
 
 def setup(bot):
     bot.add_cog(REPL(bot))
-    print("ExampleRepl charger")
+    print("ExampleRepl chargée")

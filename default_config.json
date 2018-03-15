@@ -1,8 +1,13 @@
 {
     "Bot" : {
-        "name": "Bot Name",
-        "description": "A simple description",
-        "prefix": "What wille summon the bot ?",
-        "token": "They login Token"
+        "name": "FTW - Bot",
+        "description": "[Description du bot]",
+        "prefix": "<@[id du bot]> ",
+        "token": "[Tocken du bot]",
+        "statu": "[Statut du bot par défaut]"
+    },
+    "Perms" : {
+        "Admin": ["[Admin 1]", "[Admin 2]", "[etc...]"]
     }
 }
+

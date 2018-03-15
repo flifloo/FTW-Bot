@@ -10,21 +10,21 @@ class DefaultCMD:
     async def ping(self, ctx):
         """La commande la plus stupide de se bot"""
         await self.bot.say("Pong!")
-        print("Commande ping lancer par: "+str(ctx.message.author))
+        print("Commande ping lancée par: "+str(ctx.message.author))
 
     #Commande dis
     @commands.command(pass_context=True)
     async def dis(self, ctx, *, something):
         """Un mode peroquet"""
         await self.bot.say(something)
-        print("Commande dis lancer par: "+str(ctx.message.author)+" argument: "+str(something))
+        print("Commande dis lancée par: "+str(ctx.message.author)+" argument: "+str(something))
 
     #Commande flash
     @commands.command(pass_context=True)
     async def flash(self, ctx, *, something):
         """Fait apparaitre un text siblimiquement"""
         await self.bot.delete_message(ctx.message)
-        print("Commande flash lancer par: "+str(ctx.message.author)+" argument: "+str(something))
+        print("Commande flash lancée par: "+str(ctx.message.author)+" argument: "+str(something))
 
     #Commande indirect
     @commands.command(pass_context=True)
@@ -32,10 +32,10 @@ class DefaultCMD:
         """Fait passer un message indirectement"""
         await self.bot.say("**{} said:** {}".format(str(ctx.message.author), something))
         await self.bot.delete_message(ctx.message)
-        print("Commande say lancer par: "+str(ctx.message.author)+" argument: "+str(something))
+        print("Commande say lancée par: "+str(ctx.message.author)+" argument: "+str(something))
 
 
 
 def setup(bot):
     bot.add_cog(DefaultCMD(bot))
-    print("DefaultCMD charger")
+    print("DefaultCMD chargée")

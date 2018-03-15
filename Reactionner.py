@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 
 licorne_symbole = "🦄"
-licorne = ["licorne", "pony"]
+licorne = ["licorne", "pony", "poney"]
 
 caca_symbole = "💩"
-caca = ["caca", "merde"]
+caca = ["caca", "merde", "crotte", "bouse"]
 
 sel_symbole = ":PJSalt:232086190545829888"
 sel = ["sel", "salty", "putain"]
@@ -14,7 +14,7 @@ troll_symbole = ":troll:232080409083641856"
 troll = ["troll", "trol", "trololo"]
 
 dog_symbole = "🐶"
-dog = ["waf", "chien", "dog"]
+dog = ["waf", "ouaf", "chien", "dog", "wouaf"]
 
 perfect_symbole = "👌"
 perfect = ["parfait", "perfect", "ok"]
@@ -29,39 +29,39 @@ class Reactionner:
     async def on_message(self, message):
         for i in range(len(licorne)):
             if licorne[i] in message.content.lower():
-                print("licorne detecter !")
+                print("Licorne detectée !")
                 await self.bot.add_reaction(message,licorne_symbole)
 
         for i in range(len(caca)):
             if caca[i] in message.content.lower():
-                print("caca detecter !")
+                print("Caca detecté !")
                 await self.bot.add_reaction(message,caca_symbole )
 
         for i in range(len(sel)):
             if sel[i] in message.content.lower():
-                print("sel detecter !")
+                print("Sel detecté !")
                 await self.bot.add_reaction(message,sel_symbole)
 
         for i in range(len(troll)):
             if troll[i] in message.content.lower():
-                print("troll detecter !")
+                print("Troll detecté !")
                 await self.bot.add_reaction(message,troll_symbole)
 
         for i in range(len(dog)):
             if dog[i] in message.content.lower():
-                print("Chien detecter !")
+                print("Chien detecté !")
                 await self.bot.add_reaction(message,dog_symbole)
 
         for i in range(len(perfect)):
             if perfect[i] in message.content.lower():
-                print("Perfection detecter !")
+                print("Perfection detecté !")
                 await self.bot.add_reaction(message,perfect_symbole)
 
         for i in range(len(plus)):
             if plus[i] in message.content.lower():
-                print("Plus detecter !")
+                print("Plus detecté !")
                 await self.bot.add_reaction(message,plus_symbole)
 
 def setup(bot):
     bot.add_cog(Reactionner(bot))
-    print("Reactionner charger")
+    print("Reactions chargé")

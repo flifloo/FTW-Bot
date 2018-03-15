@@ -1,13 +1,13 @@
 ## Bienvenue sur le GitHub du FTW's Bot
 
-Ce bot est celui lier au serveur Discord FTW (https://discord.gg/PtvK2ym).
+Ce bot est celui lié au serveur Discord FTW (https://discord.gg/PtvK2ym).
 
-Le bot token mit sur les pages est un exemple non fonctionelle ;)
+Le bot token mit sur les pages est un example non fonctionel ;)
 
 ### Mais pourquoi mettre ce bot sur GitHub ?
 
-Simplement pour qu'entre dev on travaille plus facillement et aussi que pour les membres du FTW puisse siganler des problems ou demander des nouveauté.
+Simplement pour qu'entres devs on puisse travailler plus facilement et aussi que pour les membres de FTW puisse signaler des problèmes ou demander des nouveautés.
 
 ### Il faut quoi ?
-Du côter python (avec pip) : Discord (obviouse), PyNaCl et youtube_dl
-Du côter géneral : ffmpeg
+Du côté python (avec pip) : Discord.py (forcément), PyNaCl et youtube_dl
+Du côté géneral : ffmpeg
