@@ -250,7 +250,7 @@ class Musique:
                 print("Commande musique pause lancée par: "+str(ctx.message.author))
                 embed=discord.Embed(title="Musique", description="", color=0x80ff00)
                 embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
-                embed.add_field(name="pause", value="Mis ene pause de la musique", inline=True)
+                embed.add_field(name="pause", value="Mise en pause de la musique", inline=True)
                 await self.bot.say(embed=embed)
                 await self.set_pause(ctx.message.author.server)
 
