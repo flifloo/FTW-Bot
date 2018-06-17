@@ -10,3 +10,4 @@ fi
   printf "\nMise a jour terminer !\n"
   printf "\nLancement du FTW-Bot...\n"
   python3.6 bot.py
+exit

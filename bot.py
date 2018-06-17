@@ -34,6 +34,9 @@ async def on_ready():
     print("Démarrage de Music")
     bot.load_extension("Music")
 
+    print("Démarrage de Channeller")
+    bot.load_extension("Channeller")
+
     print("FTW's Bot opérationel")
     embed=discord.Embed(title="Administration", description="", color=0xffff00)
     embed.set_thumbnail(url="https://icon-icons.com/icons2/562/PNG/512/on-off-power-button_icon-icons.com_53938.png")
