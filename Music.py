@@ -68,11 +68,11 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, embed=embed)
             self.current.player.start()
             await self.play_next_song.wait()
-        
+
 
 class Musique:
-    """Commandes de musique.
-    """
+    #Commandes de musique.
+
     def __init__(self, bot):
         self.bot = bot
         self.voice_states = {}
@@ -133,14 +133,14 @@ class Musique:
         embed.add_field(name="skip", value="Passer la musique", inline=True)
         embed.add_field(name="stop", value="Arrêter la musique", inline=True)
         embed.add_field(name="summon", value="Faire apparaître le bot", inline=True)
-        embed.add_field(name="volume", value="Définir le volume de la musique", inline=True)
+        #embed.add_field(name="volume", value="Définir le volume de la musique", inline=True)
         await self.bot.say(embed=embed)
 
     #Permmet de faire connecter vocalement le bot
     @music.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
-        """Invoque le bot dans le channel vocal.
-        Ne fonctionne que si l'utilisateur est déja dans un channel."""
+        #Invoque le bot dans le channel vocal.
+        #Ne fonctionne que si l'utilisateur est déja dans un channel.
         summoned_channel = ctx.message.author.voice_channel
         if summoned_channel is None:
             print("Commande musique summon lancée par: "+str(ctx.message.author)+" refuser car il n'est pas dans un channel vocal")
@@ -171,13 +171,12 @@ class Musique:
     #Permet de mettre a jouer une musique
     @music.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, song : str):
-        """Joue une musique.
-        S'il y a une musique qui joue déjà, alors elle est mise dans
-        la queue jusqu'a la derniere musique de la queue.
-        Le bot recherche automatiquement sur youtube.
-        La liste des sites supportés est trouvée ici:
-        https://rg3.github.io/youtube-dl/supportedsites.html
-        """
+        #Joue une musique.
+        #S'il y a une musique qui joue déjà, alors elle est mise dans
+        #la queue jusqu'a la derniere musique de la queue.
+        #Le bot recherche automatiquement sur youtube.
+        #La liste des sites supportés est trouvée ici:
+        #https://rg3.github.io/youtube-dl/supportedsites.html
         state = self.get_voice_state(ctx.message.server)
         opts = {
             "format":"bestaudio/worstvideo",
@@ -218,9 +217,9 @@ class Musique:
             await state.songs.put(entry)
 
     #Permmet de definit le volume
-    @music.command(pass_context=True, no_pm=True)
+    """@music.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
-        """Définie le volume du bot."""
+        #Définie le volume du bot.
         voice_channel_id = ctx.message.author.voice_channel
         if self.is_listening(voice_channel_id) == True:
             state = self.get_voice_state(ctx.message.server)
@@ -238,9 +237,9 @@ class Musique:
             embed=discord.Embed(title="Musique", description="Erreur", color=0x80ff00)
             embed.set_thumbnail(url="http://www.icone-png.com/png/16/15638.png")
             embed.add_field(name="volume", value="Vous n'étes pas dans le channel vocal !", inline=True)
-            await self.bot.say(embed=embed)
+            await self.bot.say(embed=embed)"""
 
-    #MEt en pause la musique
+    #Met en pause la musique
     @music.command(pass_context=True,no_pm=True)
     async def pause(self,ctx):
         voice_channel_id = ctx.message.author.voice_channel
@@ -283,7 +282,7 @@ class Musique:
             embed.add_field(name="resume", value="Vous n'étes pas dans le channel vocal !", inline=True)
             await self.bot.say(embed=embed)
 
-    async def on_voice_state_update(self,before,after):
+    """async def on_voice_state_update(self,before,after):
         state = self.get_voice_state(after.server)
         if type(state.voice) != type(None):
             if type(before.voice_channel) != type(None):
@@ -294,14 +293,30 @@ class Musique:
             if type(after.voice_channel) != type(None):
                 if len(after.voice_channel.voice_members)>=2:
                     try:await self.get_resume(state.voice.channel.server)
-                    except:pass
+                    except:pass"""
+    async def on_voice_state_update(self,before,after):
+        state = self.get_voice_state(after.server)
+        if type(state.voice) != type(None):
+            if len(state.voice.channel.voice_members)<2:
+                server = after.server
+                if state.is_playing():
+                    player = state.player
+                    player.stop()
+                    print("Stop lancer, channel vide !")
+
+                try:
+                    state.audio_player.cancel()
+                    del self.voice_states[server.id]
+                    await state.voice.disconnect()
+                except:
+                    pass
 
     #Arret la musique et fait quitter le bot
     @music.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
-        """Arrete la musique jouée et quitte le channel.
-        Cela vide aussi la queue.
-        """
+        #Arrete la musique jouée et quitte le channel.
+        #Cela vide aussi la queue.
+
         voice_channel_id = ctx.message.author.voice_channel
         if self.is_listening(voice_channel_id) == True:
             server = ctx.message.server
@@ -333,9 +348,9 @@ class Musique:
     #Permet de passer la musique en cours
     @music.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
-        """Vote pour passer la chanson en cours.
-        Il faut trois votes pour passer la chanson.
-        """
+        #Vote pour passer la chanson en cours.
+        #Il faut trois votes pour passer la chanson.
+
         voice_channel_id = ctx.message.author.voice_channel
         if self.is_listening(voice_channel_id) == True:
             state = self.get_voice_state(ctx.message.server)

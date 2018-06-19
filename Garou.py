@@ -3,7 +3,6 @@ import discord
 import random
 from random import randint
 from discord.ext import commands
-#from threading import Thread
 
 
 class Garou:
@@ -13,15 +12,16 @@ class Garou:
 
         with open('config.json') as json_data_file:
             self.parameter = json.load(json_data_file)
-        
+
         self.owner = self.parameter['Perms']['Admin']
 
-        #Truc utile
-        self.server = self.bot.get_server("177396472294277120")
-        self.garou_role = discord.utils.get(self.server.roles, name="Garou")
-        self.mort_role = discord.utils.get(self.server.roles, name="Morts")
+        self.server = self.bot.get_server("177396472294277120") #On defini le serveur
 
-        #Get des channels.
+        #Get des roles :
+        self.garou_role = discord.utils.get(self.server.roles, name="🐺 Garou")
+        self.mort_role = discord.utils.get(self.server.roles, name="☠️ Morts")
+
+        #Get des channels :
         self.forum_channel = self.bot.get_channel("402067902469242900")
         self.Garou_channel = self.bot.get_channel("403500093380100106")
         self.soeur_channel = self.bot.get_channel("403518380017057792")
@@ -39,7 +39,7 @@ class Garou:
         self.perms_nuit_Garou.read_message_history = False
         self.perms_nuit_Garou.send_messages = True
         self.perms_nuit_Garou.read_messages = True
-        
+
         self.perms_nuit_soeur = discord.PermissionOverwrite()
         self.perms_nuit_soeur.read_message_history = False
         self.perms_nuit_soeur.send_messages = True
@@ -56,11 +56,14 @@ class Garou:
         self.perms_jour_Garou.read_message_history = False
         self.perms_jour_Garou.send_messages = False
         self.perms_jour_Garou.read_messages = True
-        
+
         self.perms_jour_soeur = discord.PermissionOverwrite()
         self.perms_jour_soeur.read_message_history = False
         self.perms_jour_soeur.send_messages = False
         self.perms_jour_soeur.read_messages = True
+
+    """async def __unload(self):
+        await self.end()"""
 
 
     #Variables de base
@@ -397,7 +400,7 @@ class Garou:
 
     #Routine a chaque nuit
     async def night_start(self):
-        
+
         #Envoie du message de nuit
         await self.bot.send_message(self.forum_channel, embed=self.soir)
         await self.bot.change_presence(game=discord.Game(name="LG: c'est la nuit sur Thiercelieu"))
@@ -424,7 +427,7 @@ class Garou:
 
                     self.SA = 1
                     return None
-            
+
             if "CU" in self.def_joueurs.values():
                 if self.CU == 0:
                     #Tour de Cupidon
@@ -442,10 +445,10 @@ class Garou:
                     #Amoureux se rencontre
                     print("Amoureux se rencontre")
                     await self.bot.change_presence(game=discord.Game(name="LG: c'est la nuit, tour des amoureux"))
-                    
+
                     self.CU == 3
                     return None
-            
+
             if "SE" in self.def_joueurs.values():
                 if self.SE == 0:
                     #Tour des Sœur
@@ -534,10 +537,17 @@ class Garou:
                     loup=discord.Embed(title="Garou", description="Nuit", color=0xff0000)
                     loup.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
                     loup.add_field(name="Vote", value="Les votes sont ouvert pour chosir qui tuer ce soir !", inline=False)
-                    loup.add_field(name="Victime", value="")
 
-                    
                     self.LG = 1
+
+                elif self.LG == 2:
+                    print("Fin du vote des Loups-Garou")
+                    loup=discord.Embed(title="Garou", description="Nuit", color=0xff0000)
+                    loup.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
+                    loup.add_field(name="Vote", value="Les votes sont fini !", inline=False)
+                    loup.add_field(name="Vote", value="Vous avez choisi "+str(self.LG_victime)+" !", inline=False)
+
+                    self.LG = 3
                     return None
 
             if "GML" in self.def_joueurs.values():
@@ -552,7 +562,7 @@ class Garou:
 
                     self.GML = 1
                     return None
-            
+
             if "SO" in self.def_joueurs.values():
                 if self.SO == 0:
                     #Tour de la Sorcière
@@ -565,7 +575,7 @@ class Garou:
 
                     self.SO = 1
                     return None
-            
+
             if "AS" in self.def_joueurs.values():
                 if self.AS == 0:
                     #Tour de l'Assassin
@@ -609,11 +619,11 @@ class Garou:
         elif self.jour == 2:
             #if
             return None
-        
+
         #Gestion des morts
         if night_death == 0:
             await self.death()
-        
+
         self.night_death = 0
 
         #Action de fin de nuit
@@ -641,7 +651,7 @@ class Garou:
         for j, r in self.def_joueurs:
             if r != "Mort":
                 await self.bot.server_voice_state(j, mute=False, deafen=False)
-    
+
     async def death(self):
         if self.morts != []:
             mort=discord.Embed(title="Garou", description="Nuit", color=0xff0000)
@@ -654,23 +664,23 @@ class Garou:
                 mort.add_field(name="Morts", value="@"+str(j)+" est mort(e) ce soir ! \nCetait un(e) "+str(self.get_role_name(role))+" !", inline=False)
             await self.bot.send_message(self.forum_channel, embed=mort)
             self.morts = list()
-            
+
             #Gestion du retour
             if self.jour == 1:
                 if self.day_death == 0:
                     self.day_death = 1
                     await self.day_start()
-                    
+
             elif self.jour == 2:
                 if self.night_death == 0:
                     self.night_death = 1
                     await self.day_start()
-            
+
             elif self.jour == 0:
                 if self.night_death == 0:
                     self.night_death = 1
                     await self.day_start()
-            
+
             return True
 
 
@@ -702,7 +712,7 @@ class Garou:
 
         #Reset des variables
         print("Reset des variables")
-        
+
 
         #Marche pas :/
         #await self.bot.change_presence(self.save_game) #Reset du statu
@@ -736,7 +746,7 @@ class Garou:
             embed.add_field(name="Début de partie", value="Une partie a été lancer par: "+str(ctx.message.author)+" ! \nPour rejoindre, taper la commande: ```lg join```", inline=False)
             await self.bot.say(embed=embed)
             self.research = 1
-                
+
 
 
     #Commande pour rejoindre la partie
@@ -800,7 +810,7 @@ class Garou:
                 else:
                     self.game=2 #On dit que les joueurs sont defini
                     self.num_joueurs=len(self.list_joueurs) #On defini combien de joueurs en tout
-                    
+
                     print("Commande lg play lancer par: "+str(ctx.message.author)) #On log
                     await self.bot.change_presence(game=discord.Game(name='LG: definition des roles..."'))
 
@@ -818,7 +828,7 @@ class Garou:
                                         self.r = self.r+2
 
                                 self.def_joueurs[target] = self.roles[r] #Ajoute dans le dico le joueur et assigne son role grace au chiffre random
-                                
+
 
                                 #Envoie du message de role
                                 embed = self.intro(self.roles[r])
@@ -843,13 +853,13 @@ class Garou:
 
                     #Gestion des permissions de base
                     await self.bot.edit_channel_permissions(self.forum_channel, self.garou_role, self.perms_nuit_forum)
-                    
+
                     #Envoie du message du début
                     embed=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
                     embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
                     embed.add_field(name="Début de partie", value="Bienvenue dans la partie de Garou ! \nIl y a "+str(self.num_joueurs)+" habitants a Thiercelieu pour le moment. \nBonne chance !", inline=False)
                     await self.bot.send_message(self.forum_channel, embed=embed)
-                    
+
                     #On commence la nuit
                     await self.night_start()
 
@@ -862,8 +872,8 @@ class Garou:
         self.morts.append(ctx.message.author) #Pour le test
 
         await self.death()
-        
-        
+
+
 
     @lg.command(pass_context=True)
     async def vote(self, ctx):
@@ -887,11 +897,11 @@ class Garou:
 
                     elif r == "LG":
                         if self.LG == 1:
-                            #Vote des loup Garous
                             print("Vote des loups-garou")
 
-                            #Faut faire le system de vote et aprés cela 
-                            #self.LG = 2
+                            if valuraupif == True:
+                                self.LG = 2
+                                await self.night_start()
 
 
                     elif r == "VY":
