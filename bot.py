@@ -44,6 +44,16 @@ async def on_ready():
     channel = bot.get_channel("389209382388498445")
     await bot.send_message(channel, embed=embed)
 
+async def on_error(event, args):
+    print("ERROR : "+event+" | "+args)
+
+@bot.event
+async def on_member_remove(member):
+    print("Ho non ! "+str(member)+" à quitter le serveur !")
+    general = bot.get_channel("387729959051067392")
+    await bot.send_message(general, "Ho non ! "+str(member)+" à quitter le serveur !")
+
+
 @bot.command(pass_context=True)
 async def help(ctx):
     embed=discord.Embed(title="Music", description="Aide", color=0x80ff00)

@@ -67,7 +67,7 @@ class Garou:
 
 
     #Variables de base
-    game = 0 #Dit si une partie est en cours et a quelle stade elle en est
+    game = 0 #Dit si une partie est en cours et a quel stade elle en est
     gm = () #Dit qui est le GM (ID)
     list_joueurs = [] #Dit qui sont les joueurs
     morts = [] #Dit qui sont les joueurs morts
@@ -80,16 +80,19 @@ class Garou:
     num_morts = 0 #Le nombre de joueurs morts
     night_death = 0
     day_death = 0
+    LG_vote = 0
+    LG_vote_cible = []
     LG,VY,VO,SO,VG,CS,CU,CL,AG,MA,IL,IPDL,JDF,RE,GML,LGB,SA,AS,CER,MO,AC,SE,IDV,BE,ES,KZ,ISM = 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 #Mise a zero des variables des roles
 
     #Vrai variables
-    minijoueurs = 1 #5, Le nombre minimum de joueurs qu'il faut pour lancer une partie
-    roles = ["0", "LG", "VY", "VO", "SO", "VG", "VG", "CS", "CU", "LG", "CL", "AG", "MA", "IL", "IPDL", "JDF", "VG", "RE", "GML", "VG", "LGB", "VG", "SA", "LG", "AS", "CER", "MO", "AC", "SE", "SE", "IDV", "BE", "ES", "KZ", "ISM", "VG"] #Les roles donner (0 est présant poue simplifier le code pendant l'attribution des roles)
+    minijoueurs = 1 #5, Le nombre minimum de joueurs qu'il faut pour lancée une partie
+    roles = ["0", "LG", "VY", "VO", "SO", "VG", "VG", "CS", "CU", "LG", "CL", "AG", "MA", "IL", "IPDL", "JDF", "VG", "RE", "GML",
+     "VG", "LGB", "VG", "SA", "LG", "AS", "CER", "MO", "AC", "SE", "SE", "IDV", "BE", "ES", "KZ", "ISM", "VG"] #Les roles donner (0 est présent pour simplifier le code pendant l'attribution des roles)
 
-#Tout le bordel de text et messages
+    #Tout le bordel de text et messages
     #Les introductions des roles
     def intro(self, role):
-        intro=discord.Embed(title="Garou", description="Dèmarrage", color=0xff0000)
+        intro=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
         intro.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
         if role == "VG":
             intro.add_field(name="Vous êtes : ", value="Villageois")
@@ -253,9 +256,9 @@ class Garou:
             intro.add_field(name="Votre bute : ", value="**Votre but est de tuer tous les loups –garous. Toutes les nuits, vous saurez le dérouler exact de tout la nuit.**", inline=False)
             return intro
 
-    #Le nom des roles selon leur abrevation
+    #Le nom des roles selon leur abreviation
     def get_role_name(self, role):
-        intro=discord.Embed(title="Garou", description="Dèmarrage", color=0xff0000)
+        intro=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
         intro.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
         if role == "VG":
             name = "Villageois"
@@ -298,7 +301,7 @@ class Garou:
             return name
 
         elif role == "IL":
-            name = "Illettré"
+            name = "Illéttré"
             return name
 
         elif role == "IPDL":
@@ -366,20 +369,20 @@ class Garou:
             return name
 
 
-    #Erreur de partie deja en cours
+    #Erreur de partie déjà en cours
     erreur1=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
     erreur1.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-    erreur1.add_field(name="Imposible", value="Désoler mais une partie est deja en cours !", inline=False)
+    erreur1.add_field(name="Imposible", value="Désolé mais une partie est déjà en cours !", inline=False)
 
-    #Erreur de partie non lancer
+    #Erreur de partie non lancée
     erreur2=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
     erreur2.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-    erreur2.add_field(name="Imposible", value="Désoler mais aucune partie en cours !", inline=False)
+    erreur2.add_field(name="Imposible", value="Désolé mais aucune partie en cours !", inline=False)
 
     #Erreur de ne pas étre le GM
     erreur3=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
     erreur3.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-    erreur3.add_field(name="Imposible", value="Désoler mais vous n'étes pas le GM !", inline=False)
+    erreur3.add_field(name="Imposible", value="Désolé mais vous n'étes pas le GM !", inline=False)
 
     #Message de début de nuit
     soir=discord.Embed(title="Garou", description="Le temps qui passe", color=0xff0000)
@@ -405,7 +408,7 @@ class Garou:
         await self.bot.send_message(self.forum_channel, embed=self.soir)
         await self.bot.change_presence(game=discord.Game(name="LG: c'est la nuit sur Thiercelieu"))
 
-        #Definition des permission du channel general
+        #définition des permission du channel general
         await self.bot.edit_channel_permissions(self.forum_channel, self.garou_role, self.perms_nuit_forum)
         for j in self.list_joueurs:
             await self.bot.server_voice_state(j, mute=True, deafen=False)
@@ -615,7 +618,7 @@ class Garou:
                     self.ISM = 1
                     return None
 
-        #Nuit normal
+        #Nuit normale
         elif self.jour == 2:
             #if
             return None
@@ -639,7 +642,6 @@ class Garou:
         self.jour = 1
         await self.day_start()
 
-    print("Erreure Nuit")
 
     async def day_start(self):
         #Début des actions selon les roles
@@ -710,16 +712,13 @@ class Garou:
         #Remise a zero du statu du bot
         await self.bot.change_presence(game=discord.Game(name=self.parameter['Bot']['statu']))
 
-        #Reset des variables
-        print("Reset des variables")
-
-
         #Marche pas :/
         #await self.bot.change_presence(self.save_game) #Reset du statu
 
         #Reboot de l'ext
         self.bot.unload_extension("Garou")
         self.bot.load_extension("Garou")
+        return None
 
     #Définition du groupe de commande lg
     @commands.group(pass_context=True)
@@ -732,18 +731,18 @@ class Garou:
     #Commande pour démarre le jeux
     @lg.command(pass_context=True)
     async def start(self, ctx):
-        if self.game >= 1: #Verification si une partie est deja lancer
-            print("Commande lg start lancer par: "+str(ctx.message.author)+" refuser, partie deja lancer")
+        if self.game >= 1: #Verification si une partie est déjà lancée
+            print("Commande lg start lancée par: " + str(ctx.message.author) + " refusée, partie déjà lancée")
             await self.bot.say(embed=self.erreur1)
 
         else:
-            print("Commande lg start lancer par: "+str(ctx.message.author))
-            self.game=1 #On dit qu'une la partie est lancer
+            print("Commande lg start lancée par: " + str(ctx.message.author))
+            self.game=1 #On dit qu'une la partie est lancée
             self.gm=ctx.message.author #On defini le GM
-            self.list_joueurs.insert(0, ctx.message.author) #On ajoute le GM dans la liste de joueurs
-            embed=discord.Embed(title="Garou", description="Dèmarrage", color=0xff0000)
+            self.list_joueurs.append(ctx.message.author) #On ajoute le GM dans la liste de joueurs
+            embed=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
             embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-            embed.add_field(name="Début de partie", value="Une partie a été lancer par: "+str(ctx.message.author)+" ! \nPour rejoindre, taper la commande: ```lg join```", inline=False)
+            embed.add_field(name="Début de partie", value="Une partie a été lancée par: "+str(ctx.message.author)+" ! \nPour rejoindre, taper la commande: ```lg join```", inline=False)
             await self.bot.say(embed=embed)
             self.research = 1
 
@@ -752,27 +751,27 @@ class Garou:
     #Commande pour rejoindre la partie
     @lg.command(pass_context=True)
     async def join(self, ctx):
-        if self.game == 0: #Verification si une partie est deja lancer
-            print("Commande lg join lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
+        if self.game == 0: #Verification si une partie est déjà lancée
+            print("Commande lg join lancée par: "+str(ctx.message.author)+" refusée, aucune partie lancée !")
             await self.bot.say(embed=self.erreur2)
 
         elif self.game == 2:
-            print("Commande lg join lancer par: "+str(ctx.message.author)+" refuser, joueurs deja defini !")
+            print("Commande lg join lancée par: "+str(ctx.message.author)+" refusée, joueurs déjà defini !")
             await self.bot.say(embed=self.erreur1)
 
         elif self.game == 1:
             if self.gm == ctx.message.author: #Verification si c'est le GM
-                print("Commande lg join lancer par: "+str(ctx.message.author)+" refuser, c'est le GM !")
+                print("Commande lg join lancée par: "+str(ctx.message.author)+" refusée, c'est le GM !")
                 embed=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
                 embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                embed.add_field(name="Imposible", value="Désoler mais vous êtes le GM, vous avez deja rejoint par defaut.", inline=False)
+                embed.add_field(name="Imposible", value="Désolé mais vous êtes le GM, vous avez déjà rejoint par defaut.", inline=False)
                 await self.bot.say(embed=embed)
 
             else:
-                print("Commande lg join lancer par: "+str(ctx.message.author))
+                print("Commande lg join lancée par: "+str(ctx.message.author))
                 self.list_joueurs.append(ctx.message.author)
-                await self.bot.change_presence(game=discord.Game(name='LG: actuellement '+str(len(self.list_joueurs))+' habitants a Thiercelieu'))
-                embed=discord.Embed(title="Garou", description="Dèmarrage", color=0xff0000)
+                await self.bot.change_presence(game=discord.Game(name='LG: actuellement '+str(len(self.list_joueurs))+' habitants à Thiercelieu'))
+                embed=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
                 embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
                 embed.add_field(name="Début de partie", value=str(ctx.message.author)+" a rejoint !", inline=False)
                 await self.bot.say(embed=embed)
@@ -787,48 +786,47 @@ class Garou:
                         self.research = 0
 
 
-    #Commande pour lancer la partie
+    #Commande pour lancée la partie
     @lg.command(pass_context=True)
     async def play(self, ctx):
-        if self.game == 0: #Verification si une partie est deja lancer
-            print("Commande lg play lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
+        if self.game == 0: #Verification si une partie est déjà lancée
+            print("Commande lg play lancée par: "+str(ctx.message.author)+" refusée, aucune partie lancée !")
             await self.bot.say(embed=self.erreur2)
 
         elif self.game == 2:
-            print("Commande lg play lancer par: "+str(ctx.message.author)+" refuser, joueurs deja defini !")
+            print("Commande lg play lancée par: "+str(ctx.message.author)+" refusée, joueurs déjà defini !")
             await self.bot.say(embed=self.erreur1)
 
         elif self.game == 1:
             if self.gm == ctx.message.author: #Verification si c'est le GM
                 if len(self.list_joueurs) < self.minijoueurs: #Verification du nombre de joueurs minimal requi
-                    print("Commande lg play lancer par: "+str(ctx.message.author)+", refuser car minimum de joueurs pas atteint")
+                    print("Commande lg play lancée par: "+str(ctx.message.author)+", refusée car minimum de joueurs pas atteint")
                     embed=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
                     embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                    embed.add_field(name="Imposible", value="Désoler mais il n'y a que "+str(len(self.list_joueurs))+" joueur(s) dans la partie", inline=False)
+                    embed.add_field(name="Imposible", value="Désolé mais il n'y a que "+str(len(self.list_joueurs))+" joueur(s) dans la partie", inline=False)
                     await self.bot.say(embed=embed)
 
                 else:
                     self.game=2 #On dit que les joueurs sont defini
                     self.num_joueurs=len(self.list_joueurs) #On defini combien de joueurs en tout
 
-                    print("Commande lg play lancer par: "+str(ctx.message.author)) #On log
-                    await self.bot.change_presence(game=discord.Game(name='LG: definition des roles..."'))
+                    print("Commande lg play lancée par: "+str(ctx.message.author)) #On log
+                    await self.bot.change_presence(game=discord.Game(name='LG: attribution des roles..."'))
 
-                    #Definition des roles
-                    for j in range(0,self.num_joueurs): #Un boucle qui fait autent de fois qu'il y a de joueurs
+                    #définition des roles
+                    for j in range(0,self.num_joueurs): #Boucle autant de fois qu'il y a de joueurs
                         target = self.list_joueurs[j] #Prend dans la liste des joueurs le joueur en question.
-                        while self.is_joueurs(target) != True: #Boucle tant que le jouer n'est pas dans la liste des personnes défini
+                        while self.is_joueurs(target) != True: #Boucle tant que le joueur n'est pas dans la liste des personnes défini
                             r = randint(1,self.num_joueurs) #Tire un chiffre random entre 1 et le nombre de jouers
-                            if r not in self.random: #Si se chiffre a deja éter tiré, alors sela relance le while
-                                self.random.append(r) #Ajoute le chiffre random dans la liste des chiffres deja tiré
+                            if r not in self.random: #Si se chiffre a déjà été tiré, alors relance le while
+                                self.random.append(r) #Ajoute le chiffre random dans la liste des chiffres déjà tiré
 
-                                #On verifie la possibiliter d'avoir les soeurs
+                                #On vérifie la possibilité d'avoir les soeurs
                                 if self.roles[r] == "SE":
                                     if self.num_joueurs <= 28:
                                         self.r = self.r+2
 
                                 self.def_joueurs[target] = self.roles[r] #Ajoute dans le dico le joueur et assigne son role grace au chiffre random
-
 
                                 #Envoie du message de role
                                 embed = self.intro(self.roles[r])
@@ -838,13 +836,13 @@ class Garou:
                                 #Ajout du role
                                 await self.bot.add_roles(target, self.garou_role)
 
-                                #Deplacement de la personne
+                                #Déplacement de la personne
                                 await self.bot.move_member(target, self.village_voice_channel)
 
-                    #Envoie du message de dèmmarage
+                    #Envoie du message de démarrage
                     embed=discord.Embed(title="Garou", description="Démarrage", color=0xff0000)
                     embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                    embed.add_field(name="Début de partie", value="Definitions de joueurs terminer ! \nIl y a "+str(self.num_joueurs)+" joueurs dans la partie. \nDefinitions du role de chacun des joueurs en cours, ils vous seront envoyer par MP !", inline=False)
+                    embed.add_field(name="Début de partie", value="Définitions de joueurs terminée ! \nIl y a "+str(self.num_joueurs)+" joueurs dans la partie. \nDéfinitions du role de chacun des joueurs en cours, ils vous seront envoyer par MP !", inline=False)
                     await self.bot.say(embed=embed)
 
                     #Gestion du message du bot
@@ -864,7 +862,7 @@ class Garou:
                     await self.night_start()
 
             else:
-                print("Commande lg play lancer par: "+str(ctx.message.author)+" refuser, pas le GM !")
+                print("Commande lg play lancée par: "+str(ctx.message.author)+" refusée, pas le GM !")
                 await self.bot.say(embed=self.erreur3)
 
     @lg.command(pass_context=True)
@@ -877,12 +875,12 @@ class Garou:
 
     @lg.command(pass_context=True)
     async def vote(self, ctx):
-        if self.game == 0: #Verification si une partie est deja lancer
-            print("Commande lg vote lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
+        if self.game == 0: #Verification si une partie est déjà lancée
+            print("Commande lg vote lancée par: "+str(ctx.message.author)+" refusée, aucune partie lancée !")
             await self.bot.say(embed=self.erreur2)
 
         elif self.game == 1:
-            print("Commande lg vote lancer par: "+str(ctx.message.author)+" refuser, definition des joueurs non lancer !")
+            print("Commande lg vote lancée par: "+str(ctx.message.author)+" refusée, définition des joueurs non lancée !")
             await self.bot.say(embed=self.erreur1)
 
         elif self.game == 2:
@@ -898,6 +896,15 @@ class Garou:
                     elif r == "LG":
                         if self.LG == 1:
                             print("Vote des loups-garou")
+                            if LG_vote == 0:
+                                #Initialisation du vote
+                                for j, r in self.def_joueurs.items():
+                                    if r != "LG":
+                                        self.LG_vote_cible.append(j)
+                                print(self.LG_vote_cible)
+                                print(str(self.LG_vote_cible))
+
+                                #await self.bot.delete_channel_permissions(self.Garou_channel, j)
 
                             if valuraupif == True:
                                 self.LG = 2
@@ -910,7 +917,7 @@ class Garou:
                             print("Vote de la voyante")
 
                         else :
-                            await self.bot.say("Désoler mais c'est pas a vous !")
+                            await self.bot.say("Désolé mais ce n'est pas votre tour !")
 
             else:
                 print("Pas jouer")
@@ -919,44 +926,44 @@ class Garou:
     @lg.command(pass_context=True)
     async def stop(self, ctx):
         if self.game == 0:
-            print("Commande lg stop lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
+            print("Commande lg stop lancée par: "+str(ctx.message.author)+" refusée, aucune partie lancée !")
             await self.bot.say(embed=self.erreur2)
 
         elif self.game >= 1:
             if self.gm == ctx.message.author:
-                print("Commande lg stop lancer par: "+str(ctx.message.author))
+                print("Commande lg stop lancée par: "+str(ctx.message.author))
                 embed=discord.Embed(title="Garou", description="Attention", color=0xff0000)
                 embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                embed.add_field(name="Partie annuler", value="Désoler mais la partie de Garou a éter annuler.", inline=False)
+                embed.add_field(name="Partie annuler", value="Désolé mais la partie de Garou a éter annuler.", inline=False)
                 await self.bot.say(embed=embed)
 
                 await self.end() #Séquance de fin
 
             else:
-                print("Commande lg stop lancer par: "+str(ctx.message.author)+" refuser car ce n'est pas le GM !")
+                print("Commande lg stop lancée par: "+str(ctx.message.author)+" refusée car n'est pas le GM !")
                 await self.bot.say(embed=self.erreur3)
 
     @lg.command(pass_context=True)
     async def forcestop(self, ctx):
         if self.game == 0:
-            print("Commande lg force-stop lancer par: "+str(ctx.message.author)+" refuser, aucune partie lancer !")
+            print("Commande lg force-stop lancée par: "+str(ctx.message.author)+" refusée, aucune partie lancée !")
             await self.bot.say(embed=self.erreur2)
 
         elif self.game >= 1:
             if ctx.message.author.id in self.owner:
-                print("Commande lg force-stop lancer par: "+str(ctx.message.author))
+                print("Commande lg force-stop lancée par: "+str(ctx.message.author))
                 embed=discord.Embed(title="Garou", description="Attention", color=0xff0000)
                 embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                embed.add_field(name="Partie annuler de force", value="Désoler mais la partie de Garou a éter annuler par la force !", inline=False)
+                embed.add_field(name="Partie annuler de force", value="Désolé mais la partie de Garou a éter annuler par la force !", inline=False)
                 await self.bot.say(embed=embed)
 
                 await self.end(ctx) #Séquance de fin
 
             else:
-                print("Commande lg force-stop lancer par: "+str(ctx.message.author)+" refuser car ce n'est pas un Admin !")
+                print("Commande lg force-stop lancée par: "+str(ctx.message.author)+" refusée car ce n'est pas un Admin !")
                 erreur=discord.Embed(title="Garou", description="Erreur", color=0xff0000)
                 erreur.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
-                erreur.add_field(name="Imposible", value="Désoler mais vous n'étes pas Admin  !", inline=False)
+                erreur.add_field(name="Imposible", value="Désolé mais vous n'êtes pas Admin  !", inline=False)
                 await self.bot.say(embed=erreur)
 
     #Commande help
@@ -965,11 +972,11 @@ class Garou:
         embed=discord.Embed(title="Garou", description="Aide", color=0xff0000)
         embed.set_thumbnail(url="https://i.imgur.com/XLPDenM.png")
         embed.add_field(name="start", value="Lancement de la partie", inline=True)
-        embed.add_field(name="join", value="Rejoidre la partie", inline=True)
-        embed.add_field(name="play", value="Demarre la partie", inline=True)
+        embed.add_field(name="join", value="Rejoindre la partie", inline=True)
+        embed.add_field(name="play", value="Démarrer la partie", inline=True)
         embed.add_field(name="stop", value="Termine la partie", inline=True)
         await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Garou(bot))
-    print("Garou charger")
+    print("Garou chargé")
