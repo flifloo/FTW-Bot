@@ -44,6 +44,7 @@ async def on_ready():
     channel = bot.get_channel("389209382388498445")
     await bot.send_message(channel, embed=embed)
 
+@bot.event
 async def on_error(event, args):
     print("ERROR : "+event+" | "+args)
 
